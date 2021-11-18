@@ -18,8 +18,11 @@ function parseOptions(pluginOptions) {
     return defOptions;
 }
 
-function getModulesDir(buildDirectory, log) {
-    const posibles = ["_snowpack/pkg", "web_modules"];
+function getModulesDir(buildDirectory, log, metaUrlPath) {
+    let posibles = ["_snowpack/pkg", "web_modules"];
+    if (metaUrlPath) {
+        posibles.push(metaUrlPath);
+    }
     for (const dir of posibles.map((d) => path.join(buildDirectory, d))) {
         if (fs.existsSync(dir)) {
             return dir;
@@ -36,7 +39,7 @@ module.exports = (snowpackConfig, pluginOptions) => {
     return {
         name: "snowpack-files-hash",
         async optimize({ buildDirectory, log }) {
-            const modulesDir = getModulesDir(buildDirectory, log);
+            const modulesDir = getModulesDir(buildDirectory, log, snowpackConfig.buildOptions.metaUrlPath);
             if (!modulesDir) {
                 return;
             }
